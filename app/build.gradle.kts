@@ -5,12 +5,11 @@ plugins {
 
 android {
     namespace = "com.example.takeapicture"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.takeapicture"
-        minSdk = 34
-        targetSdk = 34
+        minSdk = 26
         versionCode = 1
         versionName = "1.0"
 
