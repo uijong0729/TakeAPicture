@@ -61,6 +61,7 @@ class PictureActivity : AppCompatActivity() {
      * 카메라 촬영
      */
     private fun takePhoto() {
+        Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show()
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
@@ -123,6 +124,9 @@ class PictureActivity : AppCompatActivity() {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
 
+            // 초기화(take photo 전제조건)
+            imageCapture = ImageCapture.Builder().build()
+
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -132,13 +136,14 @@ class PictureActivity : AppCompatActivity() {
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview)
+                    this, cameraSelector, preview, imageCapture)
 
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
