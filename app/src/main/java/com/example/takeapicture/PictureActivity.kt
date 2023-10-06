@@ -19,15 +19,12 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import com.example.takeapicture.databinding.ActivityMainBinding
 import com.example.takeapicture.databinding.ActivityPictureBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-typealias LumaListener = (luma: Double) -> Unit
 // 참고 : https://developer.android.com/codelabs/camerax-getting-started?hl=ko#1
 class PictureActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPictureBinding
