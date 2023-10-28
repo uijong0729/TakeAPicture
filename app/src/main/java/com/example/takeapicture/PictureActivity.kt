@@ -29,8 +29,6 @@ import java.util.Locale
 class PictureActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPictureBinding
     private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -49,56 +47,7 @@ class PictureActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         cameraExecutor = Executors.newSingleThreadExecutor()
-    }
-
-    /**
-     * 카메라 촬영
-     */
-    private fun takePhoto() {
-        Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show()
-        // Get a stable reference of the modifiable image capture use case
-        val imageCapture = imageCapture ?: return
-
-        // Create time stamped name and MediaStore entry.
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.JAPAN)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
-
-        // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
-            .build()
-
-        // Set up image capture listener, which is triggered after photo has
-        // been taken
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                    Toast.makeText(baseContext, "Photo capture failed: ${exc.message}", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
-                }
-            }
-        )
     }
 
     /**
@@ -134,6 +83,47 @@ class PictureActivity : AppCompatActivity() {
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
+
+                viewBinding.imageCaptureButton.setOnClickListener {
+                    // Create time stamped name and MediaStore entry.
+                    val name = SimpleDateFormat(FILENAME_FORMAT, Locale.JAPAN)
+                        .format(System.currentTimeMillis())
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                        }
+                    }
+
+                    // Create output options object which contains file + metadata
+                    val outputOptions = ImageCapture.OutputFileOptions
+                        .Builder(contentResolver,
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            contentValues)
+                        .build()
+
+
+                    // Set up image capture listener, which is triggered after photo has
+                    // been taken
+                    imageCapture!!.takePicture(
+                        outputOptions,
+                        ContextCompat.getMainExecutor(this),
+                        object : ImageCapture.OnImageSavedCallback {
+                            override fun onError(exc: ImageCaptureException) {
+                                Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                                Toast.makeText(baseContext, "Photo capture failed: ${exc.message}", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun
+                                    onImageSaved(output: ImageCapture.OutputFileResults){
+                                val msg = "Photo capture succeeded: ${output.savedUri}"
+                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, msg)
+                            }
+                        }
+                    )
+                }
 
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
